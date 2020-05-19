@@ -5,6 +5,7 @@ import guru.springframework.domain.Recipe;
 import guru.springframework.exceptions.RecipeNotFoundException;
 import guru.springframework.services.RecipeService;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
@@ -37,7 +38,9 @@ public class RecipeControllerTest {
     @Before
     public void setUp() throws Exception {
         recipeController = new RecipeController(service);
-        mockMvc = MockMvcBuilders.standaloneSetup(recipeController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(recipeController)
+                .setControllerAdvice(ControllerExceptionHandler.class)
+                .build();
         recipe = new Recipe();
     }
 
@@ -53,21 +56,20 @@ public class RecipeControllerTest {
     }
 
     @Test
-    public void showRecipeByIdNotFound() throws Exception {
-        //given
-        when(service.getRecipeById(anyLong())).thenThrow(RecipeNotFoundException.class);
+    public void postRecipeInvalid() throws Exception {
+        RecipeCommand command = new RecipeCommand();
+        command.setId(id);
 
-        //when
-        mockMvc.perform(get("/recipe/33/show"))
-                .andExpect(status().isNotFound())
-        .andExpect(view().name("errors/404error"));
-
-        //then
-        verify(service).getRecipeById(anyLong());
+        mockMvc.perform(post("/recipe")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("id", "")
+                .param("description", "Recette test"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("recipe/recipeform"));
     }
 
     @Test
-    public void postRecipe() throws Exception {
+    public void postRecipeValid() throws Exception {
         RecipeCommand command = new RecipeCommand();
         command.setId(id);
         when(service.saveRecipeFromCommandObject(ArgumentMatchers.any()))
@@ -76,6 +78,12 @@ public class RecipeControllerTest {
         mockMvc.perform(post("/recipe")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("id", "")
+                .param("prepTime", "5")
+                .param("cookTime", "5")
+                .param("servings", "5")
+                .param("source", "http://www.google.com")
+                .param("url", "http://www.google.com")
+                .param("directions", "directions")
                 .param("description", "Recette test"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/recipe/" + id + "/show"));
@@ -101,5 +109,36 @@ public class RecipeControllerTest {
         verify(service).deleteById(id);
     }
 
+    @Test
+    public void showRecipeByIdNotFound() throws Exception {
+        //given
+        when(service.getRecipeById(anyLong())).thenThrow(RecipeNotFoundException.class);
+
+        //when
+        mockMvc.perform(get("/recipe/33/show"))
+                .andExpect(status().isNotFound())
+                .andExpect(view().name("errors/404error"))
+                .andExpect(model().attributeExists("exception"));
+
+
+        //then
+        verify(service).getRecipeById(anyLong());
+    }
+
+    @Test
+    @Ignore
+    public void show404OnPageNotFound() throws Exception {
+        mockMvc.perform(get(nonExistingUrl))
+                .andExpect(status().isNotFound())
+                .andExpect(view().name("errors/404error"));
+    }
+
+    @Test
+    public void numberFormatExceptionHandler() throws Exception {
+        mockMvc.perform(get("/recipe/auieauie/show"))
+                .andExpect(status().isBadRequest())
+                .andExpect(view().name("errors/400error"))
+                .andExpect(model().attributeExists("exception"));
+    }
 
 }
