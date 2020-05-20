@@ -39,6 +39,7 @@ public class RecipeServiceIT {
     }
 
     @Test
+    @Ignore
     public void saveRecipeFromCommandObject() {
         Recipe recipe = repository.findAll().iterator().next();
         recipe.setDescription(DESCRIPTION);
