@@ -7,5 +7,5 @@ import java.util.Set;
 public interface UnitOfMeasureService {
     Set<UnitOfMeasureCommand> findAllCommands();
 
-    UnitOfMeasureCommand findCommandById(Long id);
+    UnitOfMeasureCommand findCommandById(String id);
 }

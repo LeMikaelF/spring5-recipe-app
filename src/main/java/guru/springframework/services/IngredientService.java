@@ -3,10 +3,10 @@ package guru.springframework.services;
 import guru.springframework.commands.IngredientCommand;
 
 public interface IngredientService {
-    IngredientCommand findByRecipeIdAndIngredientId(Long recipeId, Long ingredientId);
+    IngredientCommand findByRecipeIdAndIngredientId(String recipeId, String ingredientId);
 
     IngredientCommand save(IngredientCommand command);
 
-    void deleteByIngredientIdAndRecipeId(Long ingredientId, Long recipeId);
+    void deleteByIngredientIdAndRecipeId(String ingredientId, String recipeId);
 
 }

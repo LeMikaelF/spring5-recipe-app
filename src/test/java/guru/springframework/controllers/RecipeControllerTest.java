@@ -16,7 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.hamcrest.CoreMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -32,7 +32,7 @@ public class RecipeControllerTest {
     RecipeService service;
     RecipeController recipeController;
     MockMvc mockMvc;
-    Long id = 33L;
+    String id = String.valueOf(33L);
     Recipe recipe;
 
     @Before
@@ -93,7 +93,7 @@ public class RecipeControllerTest {
     public void updateRecipe() throws Exception {
         RecipeCommand recipeCommand = new RecipeCommand();
         recipeCommand.setId(id);
-        when(service.findCommandById(anyLong())).thenReturn(recipeCommand);
+        when(service.findCommandById(anyString())).thenReturn(recipeCommand);
 
         mockMvc.perform(get("/recipe/1/update"))
                 .andExpect(status().isOk())
@@ -112,7 +112,7 @@ public class RecipeControllerTest {
     @Test
     public void showRecipeByIdNotFound() throws Exception {
         //given
-        when(service.getRecipeById(anyLong())).thenThrow(RecipeNotFoundException.class);
+        when(service.getRecipeById(anyString())).thenThrow(RecipeNotFoundException.class);
 
         //when
         mockMvc.perform(get("/recipe/33/show"))
@@ -122,7 +122,7 @@ public class RecipeControllerTest {
 
 
         //then
-        verify(service).getRecipeById(anyLong());
+        verify(service).getRecipeById(anyString());
     }
 
     @Test
@@ -134,6 +134,8 @@ public class RecipeControllerTest {
     }
 
     @Test
+    @Ignore
+    //Disabled on type migration of id to String
     public void numberFormatExceptionHandler() throws Exception {
         mockMvc.perform(get("/recipe/auieauie/show"))
                 .andExpect(status().isBadRequest())

@@ -34,7 +34,7 @@ public class IngredientServiceImpl implements IngredientService {
     }
 
     @Override
-    public IngredientCommand findByRecipeIdAndIngredientId(Long recipeId, Long ingredientId) {
+    public IngredientCommand findByRecipeIdAndIngredientId(String recipeId, String ingredientId) {
         return recipeRepository.findById(recipeId).flatMap(recipe -> {
             return recipe.getIngredients()
                     .stream()
@@ -67,7 +67,6 @@ public class IngredientServiceImpl implements IngredientService {
         } else {
             final Ingredient ingredient = ingredientCommandToIngredient.convert(command);
             recipe.addIngredient(ingredient);
-            ingredient.setRecipe(recipe);
         }
         log.debug("IngredientCommand to save: {}", command.toString());
         return recipeRepository.save(recipe).getIngredients().stream()
@@ -82,14 +81,13 @@ public class IngredientServiceImpl implements IngredientService {
     }
 
     @Override
-    public void deleteByIngredientIdAndRecipeId(Long ingredientId, Long recipeId) {
+    public void deleteByIngredientIdAndRecipeId(String ingredientId, String recipeId) {
         recipeRepository.findById(recipeId)
                 .ifPresent(recipe -> {
                     recipe.getIngredients().stream()
                             .filter(ingredient -> Objects.equals(ingredientId, ingredient.getId()))
                             .findFirst().ifPresent(ingredient -> {
                         recipe.getIngredients().remove(ingredient);
-                        ingredient.setRecipe(null);
                     });
                     recipeRepository.save(recipe);
                 });

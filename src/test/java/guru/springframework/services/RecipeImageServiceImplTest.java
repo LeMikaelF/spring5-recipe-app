@@ -22,7 +22,7 @@ public class RecipeImageServiceImplTest {
 
     @Mock
     RecipeRepository recipeRepository;
-    final Long recipeId = 111L;
+    final String recipeId = String.valueOf(111L);
     RecipeImageServiceImpl recipeImageService;
 
     //TODO setup mocks

@@ -25,8 +25,8 @@ import static org.mockito.Mockito.when;
 
 public class IngredientServiceImplTest {
 
-    final Long ingredientId = 345L;
-    final Long recipeId = 123L;
+    final String ingredientId = String.valueOf(345L);
+    final String recipeId = String.valueOf(123L);
     @Mock
     RecipeRepository recipeRepository;
     @Mock
@@ -37,7 +37,7 @@ public class IngredientServiceImplTest {
     UnitOfMeasureRepository unitOfMeasureRepository;
 
     IngredientServiceImpl service;
-    private final Long unitOfMeasureId = 77777L;
+    private final String unitOfMeasureId = String.valueOf(77777L);
 
     @Before
     public void setUp() throws Exception {
@@ -89,7 +89,6 @@ public class IngredientServiceImplTest {
         final Recipe recipe = new Recipe();
         recipe.addIngredient(ingredient);
         recipe.setId(recipeId);
-        ingredient.setRecipe(recipe);
 
 
         when(recipeRepository.findById(any())).thenReturn(Optional.of(recipe));
@@ -113,7 +112,6 @@ public class IngredientServiceImplTest {
         recipe.setId(recipeId);
         final Ingredient ingredient = new Ingredient();
         ingredient.setId(ingredientId);
-        ingredient.setRecipe(recipe);
         recipe.addIngredient(ingredient);
 
         when(recipeRepository.findById(recipeId)).thenReturn(Optional.of(recipe));

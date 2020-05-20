@@ -6,7 +6,6 @@ import guru.springframework.repositories.RecipeRepository;
 import guru.springframework.repositories.UnitOfMeasureRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,10 +14,12 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Component
-@Profile("default")
 public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
     private final CategoryRepository categoryRepository;
     private final UnitOfMeasureRepository unitOfMeasureRepository;
@@ -33,7 +34,23 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
     @Override
     @Transactional
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
+        categoryRepository.saveAll(getCategories());
+        log.debug("Loaded categories.");
+        unitOfMeasureRepository.saveAll(getUoms());
+        log.debug("Loaded Uom's.");
         recipeRepository.saveAll(getRecipes());
+        log.debug("Loaded recipes.");
+    }
+
+    private Set<Category> getCategories() {
+        return Stream.of("American", "Italian", "Mexican", "Fast Food")
+                .map(Category::new).collect(Collectors.toSet());
+    }
+
+    private Set<UnitOfMeasure> getUoms() {
+        return Stream.of("Teaspoon", "Tablespoon", "Cup",
+                "Pinch", "Ounce", "Each", "Pint", "Dash")
+                .map(UnitOfMeasure::new).collect(Collectors.toSet());
     }
 
     //Class by John Thompson

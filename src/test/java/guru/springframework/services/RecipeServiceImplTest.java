@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class RecipeServiceImplTest {
 
-    final Long id = 123L;
+    final String id = String.valueOf(123L);
     @Mock
     RecipeRepository repository;
     @Mock
@@ -59,11 +59,11 @@ public class RecipeServiceImplTest {
 
     @Test
     public void getRecipeById() {
-        Long id = 33L;
+        String id = String.valueOf(33L);
         final Recipe recipe = new Recipe();
         recipe.setId(id);
         when(repository.findById(eq(id))).thenReturn(Optional.of(recipe));
-        assertEquals((Long) 33L, service.getRecipeById(33L).getId());
+        assertEquals("33", service.getRecipeById("33").getId());
     }
 
     @Test

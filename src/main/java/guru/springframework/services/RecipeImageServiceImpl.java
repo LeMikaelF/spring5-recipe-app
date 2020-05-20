@@ -22,7 +22,7 @@ public class RecipeImageServiceImpl implements RecipeImageService {
 
     @Override
     @Transactional
-    public boolean save(Long recipeId, MultipartFile image) throws IOException {
+    public boolean save(String recipeId, MultipartFile image) throws IOException {
         final Optional<Recipe> optRecipe = recipeRepository.findById(recipeId);
         if (optRecipe.isPresent()) {
             final byte[] bytes = image.getBytes();
@@ -38,7 +38,7 @@ public class RecipeImageServiceImpl implements RecipeImageService {
     }
 
     @Override
-    public Byte[] findById(Long recipeId) {
+    public Byte[] findById(String recipeId) {
         return recipeRepository.findById(recipeId).map(Recipe::getImage).orElse(null);
     }
 

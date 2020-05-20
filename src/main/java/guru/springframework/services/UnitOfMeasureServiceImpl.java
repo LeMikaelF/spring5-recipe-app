@@ -29,7 +29,7 @@ class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
     }
 
     @Override
-    public UnitOfMeasureCommand findCommandById(Long id) {
+    public UnitOfMeasureCommand findCommandById(String id) {
         return repository.findById(id).map(unitOfMeasureToUnitOfMeasureCommand::convert).orElse(null);
     }
 }

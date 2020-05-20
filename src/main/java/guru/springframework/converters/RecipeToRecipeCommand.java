@@ -36,11 +36,11 @@ public class RecipeToRecipeCommand implements Converter<Recipe, RecipeCommand> {
         recipeCommand.setUrl(source.getUrl());
         recipeCommand.setDirections(source.getDirections());
         recipeCommand.setIngredients(source.getIngredients().stream()
-        .map(ingredientToIngredientCommand::convert).collect(Collectors.toSet()));
+        .map(ingredientToIngredientCommand::convert).collect(Collectors.toList()));
         recipeCommand.setDifficulty(source.getDifficulty());
         recipeCommand.setNotes(notesToNotesCommand.convert(source.getNotes()));
         recipeCommand.setCategories(source.getCategories().stream()
-        .map(categoryToCategoryCommand::convert).collect(Collectors.toSet()));
+        .map(categoryToCategoryCommand::convert).collect(Collectors.toList()));
         return recipeCommand;
     }
 }

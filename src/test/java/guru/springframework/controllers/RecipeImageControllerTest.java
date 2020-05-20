@@ -25,8 +25,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class RecipeImageControllerTest {
 
-    final Long recipeId = 123L;
-    final Long nonExistingRecipeId = 999L;
+    final String recipeId = String.valueOf(123L);
+    final String nonExistingRecipeId = String.valueOf(999L);
     MockMvc mockMvc;
     RecipeImageController controller;
     @Mock
@@ -48,7 +48,7 @@ public class RecipeImageControllerTest {
         when(recipeService.recipeExists(eq(recipeId))).thenReturn(true);
 
         //when-then
-        mockMvc.perform(get(String.format("/recipe/%d/image", recipeId)))
+        mockMvc.perform(get(String.format("/recipe/%s/image", recipeId)))
                 .andExpect(view().name("recipe/imageuploadform"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("recipeId", recipeId));
@@ -62,7 +62,7 @@ public class RecipeImageControllerTest {
         when(recipeService.recipeExists(eq(nonExistingRecipeId))).thenReturn(false);
 
         //when-then
-        mockMvc.perform(get(String.format(String.format("/recipe/%d/image", nonExistingRecipeId))))
+        mockMvc.perform(get(String.format("/recipe/%s/image", nonExistingRecipeId)))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 

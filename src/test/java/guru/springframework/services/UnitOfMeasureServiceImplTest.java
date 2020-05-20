@@ -37,11 +37,11 @@ public class UnitOfMeasureServiceImplTest {
     public void findAllCommands() {
         //given
         UnitOfMeasure unitOfMeasure1 = new UnitOfMeasure();
-        unitOfMeasure1.setId(1L);
+        unitOfMeasure1.setId("1");
         final UnitOfMeasure unitOfMeasure2 = new UnitOfMeasure();
-        unitOfMeasure2.setId(2L);
+        unitOfMeasure2.setId("2");
         final UnitOfMeasure unitOfMeasure3 = new UnitOfMeasure();
-        unitOfMeasure3.setId(3L);
+        unitOfMeasure3.setId("3");
         Set<UnitOfMeasure> set = Stream.of(unitOfMeasure1, unitOfMeasure2, unitOfMeasure3)
                 .collect(Collectors.toSet());
         when(repository.findAll()).thenReturn(set);
@@ -56,7 +56,7 @@ public class UnitOfMeasureServiceImplTest {
     @Test
     public void findById() {
         //given
-        final Long uomId = 111L;
+        final String uomId = String.valueOf(111L);
         final UnitOfMeasure unitOfMeasure = new UnitOfMeasure();
         unitOfMeasure.setId(uomId);
         when(repository.findById(eq(uomId))).thenReturn(Optional.of(unitOfMeasure));

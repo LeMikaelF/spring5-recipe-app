@@ -10,7 +10,7 @@ import static org.junit.Assert.assertNotNull;
 
 public class CategoryCommandToCategoryTest {
 
-    static final Long ID = 123L;
+    static final String ID = String.valueOf(123L);
     static final String NAME = "name";
     CategoryCommandToCategory categoryCommandToCategory;
 

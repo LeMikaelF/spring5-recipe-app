@@ -22,44 +22,49 @@ public class IngredientController {
     }
 
     @GetMapping("/ingredients")
-    public String showIngredients(@PathVariable Long recipeId, Model model) {
+    public String showIngredients(@PathVariable String recipeId, Model model) {
         model.addAttribute("recipe", recipeService.findCommandById(recipeId));
+        model.addAttribute("recipeId", recipeId);
+        //FIXME Ingredients don't have ID's anymore, so API is broken.
         return "recipe/ingredient/list";
     }
 
     @GetMapping("/ingredient/{ingredientId}/show")
-    public String showIngredient(@PathVariable Long recipeId, @PathVariable Long ingredientId, Model model) {
+    public String showIngredient(@PathVariable String recipeId, @PathVariable String ingredientId, Model model) {
         model.addAttribute("ingredient", ingredientService.findByRecipeIdAndIngredientId(recipeId, ingredientId));
         return "recipe/ingredient/show";
     }
 
     @PostMapping("/ingredient")
-    public String postIngredient(@PathVariable Long recipeId, @ModelAttribute IngredientCommand command) {
+    public String postIngredient(@PathVariable String recipeId, @ModelAttribute IngredientCommand command) {
         final IngredientCommand savedCommand = ingredientService.save(command);
-        return String.format("redirect:/recipe/%d/ingredient/%d/show", recipeId, savedCommand.getId());
+        return String.format("redirect:/recipe/%s/ingredient/%s/show", recipeId, savedCommand.getId());
 
     }
 
     @GetMapping("/ingredient/{ingredientId}/update")
-    public String updateIngredient(@PathVariable Long recipeId, @PathVariable Long ingredientId, Model model) {
+    public String updateIngredient(@PathVariable String recipeId, @PathVariable String ingredientId, Model model) {
         model.addAttribute("ingredient", ingredientService.findByRecipeIdAndIngredientId(recipeId, ingredientId));
         model.addAttribute("uomList", unitOfMeasureService.findAllCommands());
+        model.addAttribute("recipeId", recipeId);
         return "recipe/ingredient/ingredientform";
     }
 
     @GetMapping("/ingredient/new")
-    public String newIngredient(@PathVariable Long recipeId, Model model) {
+    public String newIngredient(@PathVariable String recipeId, Model model) {
         final IngredientCommand ingredientCommand = new IngredientCommand();
         ingredientCommand.setRecipeId(recipeId);
         model.addAttribute("ingredient", ingredientCommand);
         model.addAttribute("uomList", unitOfMeasureService.findAllCommands());
+        model.addAttribute("recipeId", recipeId);
         return "recipe/ingredient/ingredientform";
     }
 
     @GetMapping("/ingredient/{ingredientId}/delete")
-    public String deleteIngredient(@PathVariable Long ingredientId, @PathVariable Long recipeId) {
-        ingredientService.deleteByIngredientIdAndRecipeId(ingredientId, recipeId);
-        return String.format("redirect:/recipe/%d/ingredients", recipeId);
+    public String deleteIngredient(@PathVariable String ingredientId, @PathVariable String recipeId) {
+        ingredientService.deleteByIngredientIdAndRecipeId(
+                ingredientId, recipeId);
+        return String.format("redirect:/recipe/%s/ingredients", recipeId);
     }
 
 

@@ -9,7 +9,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -26,7 +25,7 @@ public class RecipeImageController {
     }
 
     @GetMapping("/image")
-    public String showUploadForm(@PathVariable Long recipeId, Model model) {
+    public String showUploadForm(@PathVariable String recipeId, Model model) {
         if (!recipeService.recipeExists(recipeId)) {
             throw new RecipeNotFoundException(recipeId);
         }
@@ -35,17 +34,17 @@ public class RecipeImageController {
     }
 
     @PostMapping("/image")
-    public String postImage(@PathVariable Long recipeId, @RequestParam MultipartFile imagefile) throws IOException {
+    public String postImage(@PathVariable String recipeId, @RequestParam MultipartFile imagefile) throws IOException {
         final boolean success = recipeImageService.save(recipeId, imagefile);
-        if (!success) {
+/*        if (!success) {
             throw new PersistenceException("Could not persist image");
-        }
+        }*/ //TODO replace with other exception
 
-        return String.format("redirect:/recipe/%d/show", recipeId);
+        return String.format("redirect:/recipe/%s/show", recipeId);
     }
 
     @GetMapping("/recipeimage")
-    public void showRecipeImage(@PathVariable Long recipeId, HttpServletResponse response) throws IOException {
+    public void showRecipeImage(@PathVariable String recipeId, HttpServletResponse response) throws IOException {
         final Byte[] imageBytes = recipeImageService.findById(recipeId);
         if (imageBytes == null) {
             return;
