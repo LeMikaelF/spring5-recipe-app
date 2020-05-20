@@ -14,16 +14,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.*;
 
-
+@Ignore //Broken with mongo
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
 @SpringBootTest
 @ContextConfiguration(classes = {Spring5RecipeAppApplication.class})
-@Ignore
 public class RecipeServiceIT {
     private static final String DESCRIPTION = "description";
     @Autowired
@@ -41,7 +39,6 @@ public class RecipeServiceIT {
     }
 
     @Test
-    @Transactional
     public void saveRecipeFromCommandObject() {
         Recipe recipe = repository.findAll().iterator().next();
         recipe.setDescription(DESCRIPTION);
