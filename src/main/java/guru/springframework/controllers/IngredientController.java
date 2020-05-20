@@ -45,7 +45,7 @@ public class IngredientController {
     @GetMapping("/ingredient/{ingredientId}/update")
     public String updateIngredient(@PathVariable String recipeId, @PathVariable String ingredientId, Model model) {
         model.addAttribute("ingredient", ingredientService.findByRecipeIdAndIngredientId(recipeId, ingredientId));
-        model.addAttribute("uomList", unitOfMeasureService.findAllCommands());
+        model.addAttribute("uomList", unitOfMeasureService.findAllCommands().collectList().block());
         model.addAttribute("recipeId", recipeId);
         return "recipe/ingredient/ingredientform";
     }
@@ -55,7 +55,7 @@ public class IngredientController {
         final IngredientCommand ingredientCommand = new IngredientCommand();
         ingredientCommand.setRecipeId(recipeId);
         model.addAttribute("ingredient", ingredientCommand);
-        model.addAttribute("uomList", unitOfMeasureService.findAllCommands());
+        model.addAttribute("uomList", unitOfMeasureService.findAllCommands().collectList().block());
         model.addAttribute("recipeId", recipeId);
         return "recipe/ingredient/ingredientform";
     }
@@ -66,7 +66,4 @@ public class IngredientController {
                 ingredientId, recipeId);
         return String.format("redirect:/recipe/%s/ingredients", recipeId);
     }
-
-
-//TODO add error handling
 }

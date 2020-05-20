@@ -1,11 +1,11 @@
 package guru.springframework.services;
 
 import guru.springframework.commands.UnitOfMeasureCommand;
-
-import java.util.Set;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public interface UnitOfMeasureService {
-    Set<UnitOfMeasureCommand> findAllCommands();
+    Flux<UnitOfMeasureCommand> findAllCommands();
 
-    UnitOfMeasureCommand findCommandById(String id);
+    Mono<UnitOfMeasureCommand> findCommandById(String id);
 }

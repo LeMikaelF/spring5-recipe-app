@@ -3,13 +3,14 @@ package guru.springframework.services;
 import guru.springframework.commands.UnitOfMeasureCommand;
 import guru.springframework.converters.UnitOfMeasureToUnitOfMeasureCommand;
 import guru.springframework.domain.UnitOfMeasure;
-import guru.springframework.repositories.UnitOfMeasureRepository;
+import guru.springframework.repositories.reactive.UnitOfMeasureReactiveRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -21,7 +22,7 @@ import static org.mockito.Mockito.when;
 public class UnitOfMeasureServiceImplTest {
 
     @Mock
-    UnitOfMeasureRepository repository;
+    UnitOfMeasureReactiveRepository repository;
     UnitOfMeasureService service;
     UnitOfMeasureToUnitOfMeasureCommand unitOfMeasureToUnitOfMeasureCommand;
 
@@ -44,13 +45,13 @@ public class UnitOfMeasureServiceImplTest {
         unitOfMeasure3.setId("3");
         Set<UnitOfMeasure> set = Stream.of(unitOfMeasure1, unitOfMeasure2, unitOfMeasure3)
                 .collect(Collectors.toSet());
-        when(repository.findAll()).thenReturn(set);
+        when(repository.findAll()).thenReturn(Flux.fromIterable(set));
 
         //when
-        final Set<UnitOfMeasureCommand> all = service.findAllCommands();
+        final Flux<UnitOfMeasureCommand> all = service.findAllCommands();
 
         //then
-        assertEquals(set.size(), all.size());
+        assertEquals(Long.valueOf(set.size()), all.count().block());
     }
 
     @Test
@@ -59,12 +60,12 @@ public class UnitOfMeasureServiceImplTest {
         final String uomId = String.valueOf(111L);
         final UnitOfMeasure unitOfMeasure = new UnitOfMeasure();
         unitOfMeasure.setId(uomId);
-        when(repository.findById(eq(uomId))).thenReturn(Optional.of(unitOfMeasure));
+        when(repository.findById(eq(uomId))).thenReturn(Mono.just(unitOfMeasure));
 
         //when
-        final UnitOfMeasureCommand found = service.findCommandById(uomId);
+        final Mono<UnitOfMeasureCommand> found = service.findCommandById(uomId);
 
         //then
-        assertEquals(uomId, found.getId());
+        assertEquals(uomId, found.block().getId());
     }
 }

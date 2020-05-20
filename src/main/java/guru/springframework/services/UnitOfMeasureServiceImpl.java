@@ -2,34 +2,29 @@ package guru.springframework.services;
 
 import guru.springframework.commands.UnitOfMeasureCommand;
 import guru.springframework.converters.UnitOfMeasureToUnitOfMeasureCommand;
-import guru.springframework.domain.UnitOfMeasure;
-import guru.springframework.repositories.UnitOfMeasureRepository;
+import guru.springframework.repositories.reactive.UnitOfMeasureReactiveRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
-    private final UnitOfMeasureRepository repository;
+    private final UnitOfMeasureReactiveRepository repository;
     private final UnitOfMeasureToUnitOfMeasureCommand unitOfMeasureToUnitOfMeasureCommand;
 
-    UnitOfMeasureServiceImpl(UnitOfMeasureRepository repository, UnitOfMeasureToUnitOfMeasureCommand unitOfMeasureToUnitOfMeasureCommand) {
-        this.repository = repository;
+    UnitOfMeasureServiceImpl(UnitOfMeasureReactiveRepository unitOfMeasureReactiveRepository, UnitOfMeasureToUnitOfMeasureCommand unitOfMeasureToUnitOfMeasureCommand) {
+        this.repository = unitOfMeasureReactiveRepository;
         this.unitOfMeasureToUnitOfMeasureCommand = unitOfMeasureToUnitOfMeasureCommand;
     }
 
 
     @Override
-    public Set<UnitOfMeasureCommand> findAllCommands() {
-        Set<UnitOfMeasure> set = new HashSet<>();
-        repository.findAll().forEach(set::add);
-        return set.stream().map(unitOfMeasureToUnitOfMeasureCommand::convert).collect(Collectors.toSet());
+    public Flux<UnitOfMeasureCommand> findAllCommands() {
+        return repository.findAll().map(unitOfMeasureToUnitOfMeasureCommand::convert);
     }
 
     @Override
-    public UnitOfMeasureCommand findCommandById(String id) {
-        return repository.findById(id).map(unitOfMeasureToUnitOfMeasureCommand::convert).orElse(null);
+    public Mono<UnitOfMeasureCommand> findCommandById(String id) {
+        return repository.findById(id).map(unitOfMeasureToUnitOfMeasureCommand::convert);
     }
 }
