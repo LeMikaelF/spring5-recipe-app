@@ -40,15 +40,11 @@ public class IngredientServiceImpl implements IngredientService {
 
     @Override
     public Mono<IngredientCommand> findByRecipeIdAndIngredientId(String recipeId, String ingredientId) {
-        return recipeReactiveRepository.findById(recipeId)
-                .map(recipe -> recipe.getIngredients()
-                        .stream()
-                        .filter(ingredient -> ingredientId.equals(ingredient.getId()))
-                        .map(ingredientToIngredientCommand::convert)
-                        .findFirst())
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .doOnNext(command -> command.setId(recipeId));
+        return Mono.from(recipeReactiveRepository.findById(recipeId)
+                .flatMapIterable(Recipe::getIngredients)
+                .filter(ingredient -> Objects.equals(ingredientId, ingredient.getId()))
+                .map(ingredientToIngredientCommand::convert)
+                .doOnNext(command -> command.setId(recipeId)));
     }
 
     @Override
@@ -95,13 +91,11 @@ public class IngredientServiceImpl implements IngredientService {
     @Override
     public Mono<Void> deleteByIngredientIdAndRecipeId(String ingredientId, String recipeId) {
         recipeReactiveRepository.findById(recipeId)
-                .doOnNext(recipe -> {
-                    recipe.getIngredients().stream()
-                            .filter(ingredient -> Objects.equals(ingredientId, ingredient.getId()))
-                            .findFirst().ifPresent(ingredient ->
-                            recipe.getIngredients().remove(ingredient));
-                })
+                .doOnNext(recipe -> recipe.getIngredients().stream()
+                        .filter(ingredient -> Objects.equals(ingredientId, ingredient.getId()))
+                        .findFirst().ifPresent(ingredient -> recipe.getIngredients().remove(ingredient)))
                 .flatMap(recipeReactiveRepository::save).block();
+
         return Mono.empty();
     }
 }
