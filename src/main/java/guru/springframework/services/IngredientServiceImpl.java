@@ -47,8 +47,8 @@ public class IngredientServiceImpl implements IngredientService {
                         .map(ingredientToIngredientCommand::convert)
                         .findFirst())
                 .filter(Optional::isPresent)
-                .map(Optional::get);
-
+                .map(Optional::get)
+                .doOnNext(command -> command.setId(recipeId));
     }
 
     @Override
@@ -95,13 +95,13 @@ public class IngredientServiceImpl implements IngredientService {
     @Override
     public Mono<Void> deleteByIngredientIdAndRecipeId(String ingredientId, String recipeId) {
         recipeReactiveRepository.findById(recipeId)
-                .map(recipe -> {
+                .doOnNext(recipe -> {
                     recipe.getIngredients().stream()
                             .filter(ingredient -> Objects.equals(ingredientId, ingredient.getId()))
                             .findFirst().ifPresent(ingredient ->
                             recipe.getIngredients().remove(ingredient));
-                    return recipeReactiveRepository.save(recipe).block();
-                }).block();
+                })
+                .flatMap(recipeReactiveRepository::save).block();
         return Mono.empty();
     }
 }
