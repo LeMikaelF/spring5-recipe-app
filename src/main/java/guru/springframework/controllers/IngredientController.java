@@ -25,13 +25,12 @@ public class IngredientController {
     public String showIngredients(@PathVariable String recipeId, Model model) {
         model.addAttribute("recipe", recipeService.findCommandById(recipeId));
         model.addAttribute("recipeId", recipeId);
-        //FIXME Ingredients don't have ID's anymore, so API is broken.
         return "recipe/ingredient/list";
     }
 
     @GetMapping("/ingredient/{ingredientId}/show")
     public String showIngredient(@PathVariable String recipeId, @PathVariable String ingredientId, Model model) {
-        model.addAttribute("ingredient", ingredientService.findByRecipeIdAndIngredientId(recipeId, ingredientId));
+        model.addAttribute("ingredient", ingredientService.findByRecipeIdAndIngredientId(recipeId, ingredientId).block());
         return "recipe/ingredient/show";
     }
 
@@ -44,7 +43,7 @@ public class IngredientController {
 
     @GetMapping("/ingredient/{ingredientId}/update")
     public String updateIngredient(@PathVariable String recipeId, @PathVariable String ingredientId, Model model) {
-        model.addAttribute("ingredient", ingredientService.findByRecipeIdAndIngredientId(recipeId, ingredientId));
+        model.addAttribute("ingredient", ingredientService.findByRecipeIdAndIngredientId(recipeId, ingredientId).block());
         model.addAttribute("uomList", unitOfMeasureService.findAllCommands().collectList().block());
         model.addAttribute("recipeId", recipeId);
         return "recipe/ingredient/ingredientform";
