@@ -92,17 +92,16 @@ public class IngredientServiceImpl implements IngredientService {
                 );
     }
 
-    //TODO rendu ici
     @Override
-    public void deleteByIngredientIdAndRecipeId(String ingredientId, String recipeId) {
-        final Recipe recipeToSave = recipeReactiveRepository.findById(recipeId)
+    public Mono<Void> deleteByIngredientIdAndRecipeId(String ingredientId, String recipeId) {
+        recipeReactiveRepository.findById(recipeId)
                 .map(recipe -> {
                     recipe.getIngredients().stream()
                             .filter(ingredient -> Objects.equals(ingredientId, ingredient.getId()))
                             .findFirst().ifPresent(ingredient ->
                             recipe.getIngredients().remove(ingredient));
-                    return recipe;
+                    return recipeReactiveRepository.save(recipe).block();
                 }).block();
-        recipeReactiveRepository.save(recipeToSave).block();
+        return Mono.empty();
     }
 }

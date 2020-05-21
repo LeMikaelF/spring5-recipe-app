@@ -8,6 +8,6 @@ public interface IngredientService {
 
     Mono<IngredientCommand> save(IngredientCommand command);
 
-    void deleteByIngredientIdAndRecipeId(String ingredientId, String recipeId);
+    Mono<Void> deleteByIngredientIdAndRecipeId(String ingredientId, String recipeId);
 
 }
