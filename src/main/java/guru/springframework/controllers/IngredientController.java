@@ -37,7 +37,7 @@ public class IngredientController {
 
     @PostMapping("/ingredient")
     public String postIngredient(@PathVariable String recipeId, @ModelAttribute IngredientCommand command) {
-        final IngredientCommand savedCommand = ingredientService.save(command);
+        final IngredientCommand savedCommand = ingredientService.save(command).block();
         return String.format("redirect:/recipe/%s/ingredient/%s/show", recipeId, savedCommand.getId());
 
     }
