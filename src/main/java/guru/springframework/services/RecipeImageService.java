@@ -1,11 +1,12 @@
 package guru.springframework.services;
 
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 
 public interface RecipeImageService {
-    boolean save(String recipeId, MultipartFile image) throws IOException;
+    Mono<Void> save(String recipeId, MultipartFile image) throws IOException;
 
-    Byte[] findById(String recipeId);
+    Mono<Byte[]> findById(String recipeId);
 }

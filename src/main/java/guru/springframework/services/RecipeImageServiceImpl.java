@@ -1,45 +1,45 @@
 package guru.springframework.services;
 
 import guru.springframework.domain.Recipe;
-import guru.springframework.repositories.RecipeRepository;
+import guru.springframework.repositories.reactive.RecipeReactiveRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.Exceptions;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
-import java.util.Optional;
 import java.util.stream.IntStream;
 
 @Slf4j
 @Service
 public class RecipeImageServiceImpl implements RecipeImageService {
-    private final RecipeRepository recipeRepository;
+    private final RecipeReactiveRepository recipeReactiveRepository;
 
-    public RecipeImageServiceImpl(RecipeRepository recipeRepository) {
-        this.recipeRepository = recipeRepository;
+    public RecipeImageServiceImpl(RecipeReactiveRepository recipeReactiveRepository) {
+        this.recipeReactiveRepository = recipeReactiveRepository;
     }
 
     @Override
-    @Transactional
-    public boolean save(String recipeId, MultipartFile image) throws IOException {
-        final Optional<Recipe> optRecipe = recipeRepository.findById(recipeId);
-        if (optRecipe.isPresent()) {
-            final byte[] bytes = image.getBytes();
-            final Byte[] wrappedByteArray = IntStream.range(0, bytes.length).mapToObj(i -> bytes[i]).toArray(Byte[]::new);
-
-            final Recipe recipe = optRecipe.get();
-            recipe.setImage(wrappedByteArray);
-            recipeRepository.save(recipe);
-            return true;
-        } else {
-            return false;
-        }
+    public Mono<Void> save(String recipeId, MultipartFile image) throws IOException {
+        return recipeReactiveRepository.findById(recipeId)
+                .flatMap(recipe -> {
+                    final byte[] bytes;
+                    try {
+                        bytes = image.getBytes();
+                        final Byte[] wrappedByteArray = IntStream.range(0, bytes.length).mapToObj(i -> bytes[i]).toArray(Byte[]::new);
+                        recipe.setImage(wrappedByteArray);
+                        return recipeReactiveRepository.save(recipe);
+                    } catch (IOException e) {
+                        return Mono.error(Exceptions.propagate(e));
+                    }
+                })
+                .then();
     }
 
     @Override
-    public Byte[] findById(String recipeId) {
-        return recipeRepository.findById(recipeId).map(Recipe::getImage).orElse(null);
+    public Mono<Byte[]> findById(String recipeId) {
+        return recipeReactiveRepository.findById(recipeId).map(Recipe::getImage);
     }
 
 }

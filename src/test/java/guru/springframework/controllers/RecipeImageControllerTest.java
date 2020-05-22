@@ -71,7 +71,7 @@ public class RecipeImageControllerTest {
     public void postImageHappyPath() throws Exception {
         //then
         MockMultipartFile file = new MockMultipartFile("imagefile", "filename.png", "text/plain", "Contenu de l'image".getBytes());
-        when(recipeImageService.save(eq(recipeId), any())).thenReturn(true);
+        when(recipeImageService.save(eq(recipeId), any())).thenReturn(Mono.empty());
 
         //when
         mockMvc.perform(multipart("/recipe/{recipeId}/image", recipeId).file(file))
@@ -90,7 +90,7 @@ public class RecipeImageControllerTest {
         final Recipe recipe = new Recipe();
         recipe.setId(recipeId);
         recipe.setImage(wrappedImageBytes);
-        when(recipeImageService.findById(eq(recipeId))).thenReturn(wrappedImageBytes);
+        when(recipeImageService.findById(eq(recipeId))).thenReturn(Mono.just(wrappedImageBytes));
         //TODO comment est-ce que je vérifie un ResponseEntity?
 
         //when

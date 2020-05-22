@@ -35,17 +35,14 @@ public class RecipeImageController {
 
     @PostMapping("/image")
     public String postImage(@PathVariable String recipeId, @RequestParam MultipartFile imagefile) throws IOException {
-        final boolean success = recipeImageService.save(recipeId, imagefile);
-/*        if (!success) {
-            throw new PersistenceException("Could not persist image");
-        }*/ //TODO replace with other exception
+        recipeImageService.save(recipeId, imagefile).block();
 
         return String.format("redirect:/recipe/%s/show", recipeId);
     }
 
     @GetMapping("/recipeimage")
     public void showRecipeImage(@PathVariable String recipeId, HttpServletResponse response) throws IOException {
-        final Byte[] imageBytes = recipeImageService.findById(recipeId);
+        final Byte[] imageBytes = recipeImageService.findById(recipeId).block();
         if (imageBytes == null) {
             return;
         }
