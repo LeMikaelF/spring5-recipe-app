@@ -12,6 +12,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import reactor.core.publisher.Mono;
 
 import java.util.stream.IntStream;
 
@@ -45,7 +46,7 @@ public class RecipeImageControllerTest {
     @Test
     public void showUploadFormExistingRecipe() throws Exception {
         //given
-        when(recipeService.recipeExists(eq(recipeId))).thenReturn(true);
+        when(recipeService.recipeExists(eq(recipeId))).thenReturn(Mono.just(true));
 
         //when-then
         mockMvc.perform(get(String.format("/recipe/%s/image", recipeId)))
@@ -59,7 +60,7 @@ public class RecipeImageControllerTest {
     @Test
     public void showUploadFormNonExistingRecipe() throws Exception {
         //given
-        when(recipeService.recipeExists(eq(nonExistingRecipeId))).thenReturn(false);
+        when(recipeService.recipeExists(eq(nonExistingRecipeId))).thenReturn(Mono.just(false));
 
         //when-then
         mockMvc.perform(get(String.format("/recipe/%s/image", nonExistingRecipeId)))

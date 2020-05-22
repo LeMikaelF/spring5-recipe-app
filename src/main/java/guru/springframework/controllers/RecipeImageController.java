@@ -26,7 +26,7 @@ public class RecipeImageController {
 
     @GetMapping("/image")
     public String showUploadForm(@PathVariable String recipeId, Model model) {
-        if (!recipeService.recipeExists(recipeId)) {
+        if (!recipeService.recipeExists(recipeId).block()) {
             throw new RecipeNotFoundException(recipeId);
         }
         model.addAttribute("recipeId", recipeId);

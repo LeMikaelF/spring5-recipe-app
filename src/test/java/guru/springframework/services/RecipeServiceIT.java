@@ -35,7 +35,7 @@ public class RecipeServiceIT {
 
     @Test
     public void nullObject() {
-        assertNull(service.saveRecipeFromCommandObject(null));
+        assertNull(service.saveRecipeFromCommandObject(null).block());
     }
 
     @Test
@@ -44,7 +44,7 @@ public class RecipeServiceIT {
         Recipe recipe = repository.findAll().iterator().next();
         recipe.setDescription(DESCRIPTION);
         final RecipeCommand recipeCommand = recipeToRecipeCommand.convert(recipe);
-        final RecipeCommand savedRecipeCommand = service.saveRecipeFromCommandObject(recipeCommand);
+        final RecipeCommand savedRecipeCommand = service.saveRecipeFromCommandObject(recipeCommand).block();
 
         assertNotNull(recipeCommand);
         assertEquals(DESCRIPTION, savedRecipeCommand.getDescription());
@@ -55,7 +55,7 @@ public class RecipeServiceIT {
     @Test
     public void recipeExistsTrue() {
         final Recipe recipe = repository.findAll().iterator().next();
-        assertTrue(service.recipeExists(recipe.getId()));
+        assertTrue(service.recipeExists(recipe.getId()).block());
     }
 
 /*  Disabled on id migration to Strings

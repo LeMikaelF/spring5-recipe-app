@@ -23,7 +23,7 @@ public class IngredientController {
 
     @GetMapping("/ingredients")
     public String showIngredients(@PathVariable String recipeId, Model model) {
-        model.addAttribute("recipe", recipeService.findCommandById(recipeId));
+        model.addAttribute("recipe", recipeService.findCommandById(recipeId).block());
         model.addAttribute("recipeId", recipeId);
         return "recipe/ingredient/list";
     }

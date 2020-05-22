@@ -7,7 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.Set;
+import java.util.List;
 
 @Slf4j
 @Controller
@@ -20,7 +20,7 @@ public class IndexController {
 
     @RequestMapping({"", "/"})
     public String getRecipes(Model model) {
-        final Set<Recipe> recipes = recipeService.getRecipes();
+        final List<Recipe> recipes = recipeService.getRecipes().buffer().blockFirst();
         model.addAttribute("recipes", recipes);
         log.info("Added to model: {} recipes", recipes.size());
         return "index";

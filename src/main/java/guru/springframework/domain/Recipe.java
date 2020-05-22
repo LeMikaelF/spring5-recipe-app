@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -26,7 +25,6 @@ public class Recipe {
     private Difficulty difficulty;
     private Byte[] image;
     private Notes notes;
-    @DBRef
     private Set<Category> categories = new HashSet<>();
 
     public void addIngredient(Ingredient ingredient) {

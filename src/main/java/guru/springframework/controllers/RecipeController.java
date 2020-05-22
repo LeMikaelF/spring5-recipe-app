@@ -27,7 +27,7 @@ public class RecipeController {
 
     @GetMapping("/{id}/show")
     public String showRecipeById(@PathVariable String id, Model model) {
-        final Recipe recipe = recipeService.getRecipeById(id);
+        final Recipe recipe = recipeService.getRecipeById(id).block();
         model.addAttribute("recipe", recipe);
         return "recipe/show";
     }
@@ -45,13 +45,13 @@ public class RecipeController {
             result.getAllErrors().stream().map(ObjectError::toString).forEach(log::debug);
             return "recipe/recipeform";
         }
-        final RecipeCommand savedCommand = recipeService.saveRecipeFromCommandObject(command);
+        final RecipeCommand savedCommand = recipeService.saveRecipeFromCommandObject(command).block();
         return "redirect:/recipe/" + savedCommand.getId() + "/show";
     }
 
     @GetMapping("/{id}/update")
     public String updateRecipe(@PathVariable String id, Model model) {
-        final RecipeCommand recipeCommand = recipeService.findCommandById(id);
+        final RecipeCommand recipeCommand = recipeService.findCommandById(id).block();
         model.addAttribute("recipe", recipeCommand);
         return "recipe/recipeform";
     }

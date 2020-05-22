@@ -10,9 +10,11 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.Model;
+import reactor.core.publisher.Flux;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.matches;
@@ -36,23 +38,27 @@ public class IndexControllerTest {
 
     @Test
     public void testMockMvc() throws Exception {
+        //given
+        when(recipeService.getRecipes()).thenReturn(Flux.just(new Recipe()));
+
+        //when
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         mockMvc.perform(get("/")).andExpect(status().isOk())
                 .andExpect(view().name("index"));
+
+        //then
+        verify(recipeService).getRecipes();
     }
 
     @Test
     public void getRecipes() {
-        final Set<Recipe> recipes = new HashSet<>();
         final Recipe recipe1 = new Recipe();
         recipe1.setDescription("first");
         final Recipe recipe2 = new Recipe();
         recipe2.setDescription("second");
-        recipes.add(recipe1);
-        recipes.add(recipe2);
+        when(recipeService.getRecipes()).thenReturn(Flux.fromStream(Stream.of(recipe1, recipe2)));
 
-        when(recipeService.getRecipes()).thenReturn(recipes);
-        final ArgumentCaptor<Set<Recipe>> argumentCaptor = ArgumentCaptor.forClass(Set.class);
+        final ArgumentCaptor<List<Recipe>> argumentCaptor = ArgumentCaptor.forClass(ArrayList.class);
 
         assertEquals("index", controller.getRecipes(model));
         verify(model, times(1)).addAttribute(matches("recipes"), argumentCaptor.capture());
