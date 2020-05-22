@@ -56,7 +56,9 @@ class RecipeServiceImpl implements RecipeService {
     @Override
     public Mono<RecipeCommand> findCommandById(String id) {
         return recipeReactiveRepository.findById(id)
-                .map(recipeToRecipeCommand::convert);
+                .map(recipeToRecipeCommand::convert)
+                .doOnNext(recipeCommand -> recipeCommand.getIngredients()
+                        .forEach(ingredientCommand -> ingredientCommand.setRecipeId(id)));
     }
 
     @Override
