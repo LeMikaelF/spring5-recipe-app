@@ -3,14 +3,11 @@ package guru.springframework.controllers;
 import guru.springframework.exceptions.RecipeNotFoundException;
 import guru.springframework.services.RecipeImageService;
 import guru.springframework.services.RecipeService;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 @Controller
@@ -40,7 +37,7 @@ public class RecipeImageController {
         return String.format("redirect:/recipe/%s/show", recipeId);
     }
 
-    @GetMapping("/recipeimage")
+/*    @GetMapping("/recipeimage")
     public void showRecipeImage(@PathVariable String recipeId, HttpServletResponse response) throws IOException {
         final Byte[] imageBytes = recipeImageService.findById(recipeId).block();
         if (imageBytes == null) {
@@ -55,5 +52,5 @@ public class RecipeImageController {
         response.setContentType("image/jpeg");
         final ByteArrayInputStream is = new ByteArrayInputStream(primitiveBytes);
         IOUtils.copy(is, response.getOutputStream());
-    }
+    }*/
 }

@@ -7,6 +7,7 @@ import guru.springframework.services.UnitOfMeasureService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 @RequestMapping("/recipe/{recipeId}")
 @Controller
@@ -22,47 +23,55 @@ public class IngredientController {
     }
 
     @GetMapping("/ingredients")
-    public String showIngredients(@PathVariable String recipeId, Model model) {
-        model.addAttribute("recipe", recipeService.findCommandById(recipeId).block());
-        model.addAttribute("recipeId", recipeId);
-        return "recipe/ingredient/list";
+    public Mono<String> showIngredients(@PathVariable String recipeId, Model model) {
+        return recipeService.findCommandById(recipeId)
+                .doOnNext(recipeCommand -> model.addAttribute("recipe", recipeCommand))
+                .then()
+                .doOnNext(aVoid -> model.addAttribute("recipeId", recipeId))
+                .thenReturn("recipe/ingredient/list");
     }
 
     @GetMapping("/ingredient/{ingredientId}/show")
-    public String showIngredient(@PathVariable String recipeId, @PathVariable String ingredientId, Model model) {
-        model.addAttribute("ingredient", ingredientService.findByRecipeIdAndIngredientId(recipeId, ingredientId).block());
-        return "recipe/ingredient/show";
+    public Mono<String> showIngredient(@PathVariable String recipeId, @PathVariable String ingredientId, Model model) {
+        return ingredientService.findByRecipeIdAndIngredientId(recipeId, ingredientId)
+                .map(ingredientCommand -> model.addAttribute("ingredient", ingredientCommand))
+                .thenReturn("recipe/ingredient/show");
     }
 
     @PostMapping("/ingredient")
-    public String postIngredient(@PathVariable String recipeId, @ModelAttribute IngredientCommand command) {
-        final IngredientCommand savedCommand = ingredientService.save(command).block();
-        return String.format("redirect:/recipe/%s/ingredient/%s/show", recipeId, savedCommand.getId());
+    public Mono<String> postIngredient(@PathVariable String recipeId, @ModelAttribute IngredientCommand command) {
+     return ingredientService.save(command)
+             .map(ingredientCommand ->
+                     String.format("redirect:/recipe/%s/ingredient/%s/show", recipeId, ingredientCommand.getId()));
 
     }
 
     @GetMapping("/ingredient/{ingredientId}/update")
-    public String updateIngredient(@PathVariable String recipeId, @PathVariable String ingredientId, Model model) {
-        model.addAttribute("ingredient", ingredientService.findByRecipeIdAndIngredientId(recipeId, ingredientId).block());
-        model.addAttribute("uomList", unitOfMeasureService.findAllCommands().collectList().block());
-        model.addAttribute("recipeId", recipeId);
-        return "recipe/ingredient/ingredientform";
+    public Mono<String> updateIngredient(@PathVariable String recipeId, @PathVariable String ingredientId, Model model) {
+        return ingredientService.findByRecipeIdAndIngredientId(recipeId, ingredientId)
+                .doOnNext(ingredientCommand -> model.addAttribute("ingredient", ingredientCommand))
+                .then(unitOfMeasureService.findAllCommands().collectList())
+                .doOnNext(unitOfMeasureCommands -> model.addAttribute("uomList", unitOfMeasureCommands))
+                .then()
+                .map(aVoid -> model.addAttribute("recipeId", recipeId))
+                .thenReturn("recipe/ingredient/ingredientform");
     }
 
     @GetMapping("/ingredient/new")
-    public String newIngredient(@PathVariable String recipeId, Model model) {
+    public Mono<String> newIngredient(@PathVariable String recipeId, Model model) {
         final IngredientCommand ingredientCommand = new IngredientCommand();
         ingredientCommand.setRecipeId(recipeId);
-        model.addAttribute("ingredient", ingredientCommand);
-        model.addAttribute("uomList", unitOfMeasureService.findAllCommands().collectList().block());
-        model.addAttribute("recipeId", recipeId);
-        return "recipe/ingredient/ingredientform";
+        return unitOfMeasureService.findAllCommands().collectList()
+                .map(unitOfMeasureCommands -> model.addAttribute("uomList", unitOfMeasureCommands))
+                .then()
+                .doOnNext(aVoid -> model.addAttribute("ingredient", ingredientCommand))
+                .doOnNext(aVoid -> model.addAttribute("recipeId", recipeId))
+                .thenReturn("recipe/ingredient/ingredientform");
     }
 
     @GetMapping("/ingredient/{ingredientId}/delete")
-    public String deleteIngredient(@PathVariable String ingredientId, @PathVariable String recipeId) {
-        ingredientService.deleteByIngredientIdAndRecipeId(ingredientId, recipeId)
-                .block();
-        return String.format("redirect:/recipe/%s/ingredients", recipeId);
+    public Mono<String> deleteIngredient(@PathVariable String ingredientId, @PathVariable String recipeId) {
+        return ingredientService.deleteByIngredientIdAndRecipeId(ingredientId, recipeId)
+                .thenReturn(String.format("redirect:/recipe/%s/ingredients", recipeId));
     }
 }
